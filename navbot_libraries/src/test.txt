@@ -1,0 +1,145 @@
+
+#include "navbot_libraries/path_finding.hpp"
+
+
+
+PathFinding::PathFinding() {}
+
+void PathFinding::setGrid(int ROW, int COL, const nc::NdArray<int>& grid) {
+    map_row_ = ROW;
+    map_col_ = COL;
+    grid_ = grid;
+}
+
+bool PathFinding::findPath(Pair src, Pair dest) {
+    path_.clear();
+    return aStarSearch(src, dest);
+}
+
+vector<Pair> PathFinding::getPath() const { return path_; }
+    
+bool PathFinding::isValid(int row, int col) const {
+    return row >= 0 && row < map_row_ && col >= 0 && col < map_col_;
+}
+
+bool PathFinding::isUnBlocked(int row, int col) const {
+    return grid_(row, col) == 0; // ROS occupancy: 0 = free
+}
+
+bool PathFinding::isDestination(int row, int col, Pair dest) const {
+    return row == dest.first && col == dest.second;
+}
+
+double PathFinding::calculateH(int row, int col, Pair dest) const {
+    // Euclidean distance
+    return sqrt(pow(row - dest.first, 2) + pow(col - dest.second, 2));
+}
+
+void PathFinding::tracePath(const nc::NdArray<Cell>& cellDetails, Pair dest) {
+    stack<Pair> s;
+    int row = dest.first;
+    int col = dest.second;
+
+    while (!(cellDetails(row, col).parent_i == row &&
+                cellDetails(row, col).parent_j == col)) {
+        s.push({row, col});
+        int temp_row = cellDetails(row, col).parent_i;
+        int temp_col = cellDetails(row, col).parent_j;
+        row = temp_row;
+        col = temp_col;
+    }
+    s.push({row, col});
+
+    while (!s.empty()) {
+        path_.push_back(s.top());
+        s.pop();
+    }
+}
+
+bool PathFinding::aStarSearch(Pair src, Pair dest) {
+    if (!isValid(src.first, src.second) || !isValid(dest.first, dest.second)) {
+        cout << "Source or destination is invalid\n";
+        return false;
+    }
+    if (!isUnBlocked(src.first, src.second) || !isUnBlocked(dest.first, dest.second)) {
+        cout << "Source or destination is blocked\n";
+        return false;
+    }
+    if (isDestination(src.first, src.second, dest)) {
+        cout << "We are already at the destination\n";
+        return false;
+    }
+
+    nc::NdArray<bool> closedList(map_row_, map_col_);
+    closedList = false;
+
+    nc::NdArray<Cell> cellDetails(map_row_, map_col_);
+    for (int i = 0; i < map_row_; i++)
+        for (int j = 0; j < map_col_; j++) {
+            cellDetails(i, j).f = cellDetails(i, j).g = cellDetails(i, j).h =
+                numeric_limits<double>::infinity();
+            cellDetails(i, j).parent_i = cellDetails(i, j).parent_j = -1;
+        }
+
+    int i = src.first, j = src.second;
+    cellDetails(i, j).f = 0.0;
+    cellDetails(i, j).g = 0.0;
+    cellDetails(i, j).h = 0.0;
+    cellDetails(i, j).parent_i = i;
+    cellDetails(i, j).parent_j = j;
+
+    // Priority queue: min-heap based on f-cost
+    priority_queue<Node, vector<Node>, greater<Node>> openList;
+    openList.push({0.0, i, j});
+
+    // Directions: N, S, E, W, NE, NW, SE, SW
+    const int dRow[8] = {-1, 1, 0, 0, -1, -1, 1, 1};
+    const int dCol[8] = {0, 0, 1, -1, 1, -1, 1, -1};
+    const double moveCost[8] = {1, 1, 1, 1, 1.414, 1.414, 1.414, 1.414};
+
+    while (!openList.empty()) {
+        Node current = openList.top();
+        openList.pop();
+
+        i = current.row;
+        j = current.col;
+        closedList(i, j) = true;
+
+        for (int dir = 0; dir < 8; dir++) {
+            int newRow = i + dRow[dir];
+            int newCol = j + dCol[dir];
+
+            // Skip invalid or blocked
+            if (!isValid(newRow, newCol) || !isUnBlocked(newRow, newCol) || closedList(newRow, newCol))
+                continue;
+
+            // Diagonal move: prevent corner cutting
+            if (dir >= 4) {
+                if (!isUnBlocked(i, newCol) || !isUnBlocked(newRow, j))
+                    continue;
+            }
+
+            double gNew = cellDetails(i, j).g + moveCost[dir];
+            double hNew = calculateH(newRow, newCol, dest);
+            double fNew = gNew + hNew;
+
+            if (cellDetails(newRow, newCol).f == numeric_limits<double>::infinity() || cellDetails(newRow, newCol).f > fNew) {
+                openList.push({fNew, newRow, newCol});
+                cellDetails(newRow, newCol).f = fNew;
+                cellDetails(newRow, newCol).g = gNew;
+                cellDetails(newRow, newCol).h = hNew;
+                cellDetails(newRow, newCol).parent_i = i;
+                cellDetails(newRow, newCol).parent_j = j;
+            }
+
+            if (isDestination(newRow, newCol, dest)) {
+                tracePath(cellDetails, dest);
+                return true;
+            }
+        }
+    }
+
+    cout << "Failed to find the Destination Cell\n";
+    return false;
+}
+

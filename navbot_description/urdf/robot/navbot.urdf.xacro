@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot name="navbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:arg name="robot_name" default="navbot"/>
+  <xacro:arg name="prefix" default=""/>
+  <xacro:arg name="use_gazebo" default="false"/>
+
+  <xacro:include filename="common_properties.xacro" />
+  <xacro:include filename="$(find navbot_description)/urdf/mech/navbot_base.xacro"/>
+  <xacro:include filename="$(find navbot_description)/urdf/sensors/rgbd_camera.xacro"/>
+  <xacro:include filename="$(find navbot_description)/urdf/sensors/lidar.xacro"/> 
+  <xacro:include filename="$(find navbot_description)/urdf/sensors/imu.xacro"/>
+  
+  <!-- <xacro:include filename="navbot.ros2_control.xacro" /> -->
+
+  <xacro:rgbd_camera
+    prefix="$(arg prefix)"
+    camera_name="cam_1"
+    xyz_offset="0.1155 0 0.054"
+    rpy_offset="0 -0.50 0"/>
+
+  <xacro:lidar_sensor
+    prefix="$(arg prefix)"
+    parent="holder_link"
+    frame_id="laser_frame"
+    xyz_offset="0 0 0.0199"
+    rpy_offset="0 -0.02 0"
+    mesh_xyz_offset="0 0 0"
+    mesh_rpy_offset="${-M_PI/2} 0 0"
+    topic_name="scan"
+    visualize="true"/>
+
+  <xacro:imu_sensor
+    prefix="$(arg prefix)"
+    parent="base_link"
+    frame_id="imu"
+    xyz_offset="0 0 0.054"
+    rpy_offset="0 0 0"
+    update_rate="15.0"
+    topic_name="imu/data"/>
+
+  <xacro:include filename="$(find navbot_description)/urdf/control/velocity_control_plugin.urdf.xacro" />
+  <xacro:load_velocity_control_plugin use_gazebo="$(arg use_gazebo)"/>
+
+  <xacro:include filename="$(find navbot_description)/urdf/control/gazebo_sim_ros2_control.urdf.xacro" />
+  <xacro:load_gazebo_sim_ros2_control_plugin
+    robot_name="$(arg robot_name)"
+    use_gazebo="$(arg use_gazebo)"/>
+ 
+  <xacro:include filename="$(find navbot_description)/urdf/control/navbot_ros2_control.urdf.xacro" />
+  <xacro:navbot_ros2_control
+    use_gazebo="$(arg use_gazebo)"/>
+
+</robot>
