@@ -36,7 +36,7 @@ def generate_launch_description():
     ekf_config_file_path = 'config/ekf.yaml'
     map_file_path = 'maps/cafe_world_map.yaml'
     nav2_params_path = 'config/navbot_nav2_default_params.yaml'
-    rviz_config_file_path = 'rviz/custom_navigation_view.rviz'
+    rviz_config_file_path = 'rviz/nav2_default_view.rviz'
 
     # Set the path to different packages
     pkg_share_docking = FindPackageShare(

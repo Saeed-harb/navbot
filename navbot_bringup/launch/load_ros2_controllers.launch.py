@@ -27,7 +27,7 @@ def generate_launch_description():
     Returns:
         LaunchDescription: Launch description containing sequenced controller starts
     """
-    # Start mecanum drive controller
+    # Start diff drive controller
     start_diff_drive_controller_cmd = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'diff_drive_controller'],
