@@ -61,13 +61,13 @@ Start the complete simulation/navigation/dock-perception launch in a sourced ter
 
 ```bash
 ros2 launch navbot_bringup navbot_navigation.launch.py \
-  world_file:=overmind.sdf \
+  world_file:=cafe.world \
   map:=/home/$USER/navbot_ws/src/navbot/navbot_navigation/maps/cafe_world_map.yaml \
   use_sim_time:=true \
   use_rviz:=true
 ```
 
-If the checkout is elsewhere, update the `map` path. The launch defaults to `cafe.world`; `world_file:=overmind.sdf` selects the included world used by the repository's simulation helper script. Set `slam:=True` to start SLAM instead of using the saved map.
+If the checkout is elsewhere, update the `map` path. The launch uses `cafe.world` by default. Set `slam:=True` to start SLAM instead of using the saved map.
 
 Once Nav2 is active, send a map-frame goal (example uses the configured dock location) from another sourced terminal:
 
