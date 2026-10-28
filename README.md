@@ -27,17 +27,15 @@ NavBot is a ROS 2 robotics workspace for a custom differential-drive mobile robo
 
 ## Project demos
 
-Add the two video URLs to the links below before publishing this README. GitHub renders uploaded MP4s when a video is attached to an issue, discussion, or release; you can also link to YouTube or another host.
-
 ### Simulated docking
 
-**[▶ Watch the simulated docking demo](PASTE_SIMULATED_DOCKING_VIDEO_URL)**
+![NavBot simulated docking demo](docs/media/docking-demo.gif)
 
 The simulation brings up Gazebo, Nav2, localization, the AprilTag detector, and the goal handling nodes. The dock database currently defines `dock0` at `(-4.96, 1.5, 0.0)` in the `map` frame.
 
 ### Physical robot: checkpoint navigation
 
-**[▶ Watch the real robot move between checkpoints](PASTE_HARDWARE_DEMO_VIDEO_URL)**
+![NavBot real robot checkpoint navigation demo](docs/media/navigation-demo.gif)
 
 The physical robot follows predefined checkpoints using ROS 2 for high-level motion control and an ESP32 for wheel-level actuation and sensing.
 
@@ -170,10 +168,6 @@ README/                    Reference README samples
 ## Skills demonstrated
 
 ROS 2 system integration · differential-drive kinematics · PID control · embedded C++ · ESP32 · micro-ROS · PlatformIO · `ros2_control` · Nav2 · Gazebo Sim · RViz · EKF sensor fusion · AprilTag perception · Xacro/URDF · CMake and Python ROS packages
-
-## Git tracking note
-
-The firmware directory is already tracked in this checkout: Git lists its 14 source/configuration files, including `src/main.cpp` and `platformio.ini`. Its generated `.pio/` build output and `.vscode/` editor files are ignored. No force-add or ignore-rule change was needed. After committing and pushing the repository's current branch, the tracked firmware files will be included on GitHub.
 
 ## License
 
