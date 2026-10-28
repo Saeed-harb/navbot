@@ -28,6 +28,7 @@ setup(
             "twist_stamper = navbot_py_pkg.twist_stamper:main",
             "robot_controller = navbot_py_pkg.robot_controller:main",
             "imu_publisher = navbot_py_pkg.imu_publisher:main",
+            "path_follower_client = navbot_py_pkg.path_follower_client:main",
             "potentiometer_simulator = navbot_py_pkg.potentiometer_simulator:main",
             "pure_pursuit = navbot_py_pkg.pure_pursuit:main"
         ],
